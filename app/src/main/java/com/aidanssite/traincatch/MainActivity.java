@@ -15,8 +15,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private TransitDirectory transitDir; // TODO: Make this global
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        transitDir = new TransitDirectory();
+
+        ((TrainCatch) this.getApplication()).setTransitDirectory(transitDir);
     }
 
     public void openStartAct() {

@@ -26,11 +26,13 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
             RAIL_AD = 1;
 
     public int APIID, routeID = -1;
-    private String[][] params;
+    private String[][] queryParams, routeParams;
     private String baseURL, routeString, APIKey = "";
 
-    public APIManager (int APIID, int routeID, String[][] params) {
-        this.params = params;
+    public APIManager (int APIID, int routeID, String[][] queryParams, String[][] routeParams) {
+        this.queryParams = queryParams;
+        this.routeParams = routeParams;
+
 
         initializeSettings(APIID, routeID);
 
@@ -38,16 +40,16 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
     }
 
     @Override
-    protected JSONArray doInBackground(Void...voids) {
+    protected JSONArray doInBackground (Void...voids) {
         Log.d("APIManager", "Began execution");
 
         String rJsonString = "";
         JSONArray rJson = null;
 
-        String queryStr = formatParams(params, APIKey);
+        String queryStr = formatQueryParams(queryParams, APIKey);
 
         try {
-            URL url = new URL("https://www3.septa.org/hackathon/locations/get_locations.php" + queryStr);
+            URL url = new URL(baseURL + routeString + queryStr);
             HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
 
@@ -71,36 +73,38 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
         return rJson;
     }
 
-    protected void onPostExecute(JSONArray result) {
-        Log.d("QUERY COMPLETE", "RESULT: " + result);
-
+    protected void onPostExecute (JSONArray result) {
         switch (APIID) {
             case GOOGLE_MAPS: {
                 switch (routeID) {
                     case DISTANCE_MATRIX: {
-
+                        Log.d("APIManager Result", "Google Maps Distance Matrix: " + result);
                     }
                 }
             }
 
             case SEPTA: {
                 switch (routeID) {
-                    case DISTANCE_MATRIX: {
+                    case SYSTEM_LOCATIONS: {
+                        parseSeptaLocations(result);
+                    }
 
+                    case RAIL_AD: {
+                        Log.d("APIManager Result", "SEPTA Rail A/D: " + result);
                     }
                 }
             }
         }
     }
 
-    private String formatParams(String[][] params, String APIKey) {
-        if (params.length != 0 && APIKey.length() != 0) {
+    private String formatQueryParams (String[][] queryParams, String APIKey) {
+        if (queryParams.length != 0 && APIKey.length() != 0) {
             String queryStr = "?";
 
-            for (int i = 0; i < params.length; i++) {
-                queryStr += params[i][0] + "=" + params[i][1];
+            for (int i = 0; i < queryParams.length; i++) {
+                queryStr += queryParams[i][0] + "=" + queryParams[i][1];
 
-                if (i < params.length - 1) {
+                if (i < queryParams.length - 1) {
                     queryStr += "&";
                 }
             }
@@ -115,7 +119,7 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
         return "";
     }
 
-    private String readStream(InputStream in) {
+    private String readStream (InputStream in) {
         String result = "";
 
         try {
@@ -134,18 +138,22 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
         return result;
     }
 
-    private void initializeSettings(int APIID, int routeID) {
+    private void parseSeptaLocations (JSONArray locJson) {
+        //  TODO
+    }
+
+    private void initializeSettings (int APIID, int routeID) {
         this.APIID = APIID;
         this.routeID = routeID;
 
         switch (APIID) {
             case GOOGLE_MAPS: {
-                baseURL = "google";
+                baseURL = "https://maps.googleapis.com/maps/api/";
                 APIKey = "AIzaSyCerGZoWR42ZQNYXT3Cq08MrEMr4Kj4NH0";
 
                 switch (routeID) {
                     case DISTANCE_MATRIX: {
-                        routeString = "google";
+                        routeString = "distancematrix/json";
                     }
                 }
             }
@@ -159,7 +167,7 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
                     }
 
                     case RAIL_AD: {
-                        routeString = "Arrivals";
+                        routeString = "Arrivals/";
                     }
                 }
             }

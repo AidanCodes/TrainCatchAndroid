@@ -50,7 +50,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
         if (userLoc != null) {
             String[][] latLonParam = {{"lat", Double.toString(userLoc.getLatitude())}, {"lon", Double.toString(userLoc.getLongitude())}, {"radius", "100"}, {"type", "rail_stations"}};
-            APIManager septaLocAPI = new APIManager(APIManager.SEPTA, APIManager.SYSTEM_LOCATIONS, latLonParam);
+            APIManager septaLocAPI = new APIManager(APIManager.SEPTA, APIManager.SYSTEM_LOCATIONS, latLonParam, new String[0][0]);
             septaLocAPI.execute();
         }
     }
