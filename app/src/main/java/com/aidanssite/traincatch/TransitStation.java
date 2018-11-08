@@ -6,11 +6,12 @@ public class TransitStation {
     private double latitude, longitude;
     private ArrayList<TransitRoute> routes;
 
-    private String company, locationID, locationName;
+    private String company, locationID, locationName, type;
     private int APIID;
 
-    public TransitStation (String company, int APIID, String locationID, String locationName, double latitude, double longitude) {
+    public TransitStation (String company, int APIID, String type, String locationID, String locationName, double latitude, double longitude) {
         this.company = company;
+        this.type = type;
         this.APIID = APIID;
         this.locationID = locationID;
         this.locationName = locationName;
@@ -28,6 +29,10 @@ public class TransitStation {
 
     public String getCompany () {
         return company;
+    }
+
+    public String getType () {
+        return type;
     }
 
     public int getAPIID () {

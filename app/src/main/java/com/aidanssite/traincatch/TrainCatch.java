@@ -3,13 +3,14 @@ package com.aidanssite.traincatch;
 import android.app.Application;
 
 public class TrainCatch extends Application {
-    private TransitDirectory transitDirectory;
+    private static TransitDirectory transitDirectory;
 
-    public TransitDirectory getTransitDirectory () {
+    public static TransitDirectory getTransitDirectory () {
         return transitDirectory;
     }
 
-    public void setTransitDirectory (TransitDirectory newTDirectory) {
-        this.transitDirectory = newTDirectory;
+    public TransitDirectory setTransitDirectory (TransitDirectory newTDirectory) {
+        transitDirectory = newTDirectory;
+        return transitDirectory;
     }
 }

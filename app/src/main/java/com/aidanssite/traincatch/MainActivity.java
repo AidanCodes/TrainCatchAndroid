@@ -54,9 +54,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        transitDir = new TransitDirectory();
-
-        ((TrainCatch) this.getApplication()).setTransitDirectory(transitDir);
+        transitDir = ((TrainCatch) this.getApplication()).setTransitDirectory(new TransitDirectory());
     }
 
     public void openStartAct() {

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -28,6 +29,7 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
     public int APIID, routeID = -1;
     private String[][] queryParams, routeParams;
     private String baseURL, routeString, APIKey = "";
+    private TransitDirectory transitDirectory = null;
 
     public APIManager (int APIID, int routeID, String[][] queryParams, String[][] routeParams) {
         this.queryParams = queryParams;
@@ -35,6 +37,8 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
 
 
         initializeSettings(APIID, routeID);
+
+        transitDirectory = TrainCatch.getTransitDirectory();
 
         Log.d("APIManager", "Initialized APIManager");
     }
@@ -140,6 +144,26 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
 
     private void parseSeptaLocations (JSONArray locJson) {
         //  TODO
+        for (int i = 0; i < locJson.length(); i ++) {
+            TransitStation newStation = null;
+            JSONObject locJsonObj = null;
+            try {
+                locJsonObj = locJson.getJSONObject(i);
+
+                newStation = new TransitStation("SEPTA",
+                        SEPTA,
+                        locJsonObj.getString("location_type"),
+                        locJsonObj.getString("location_id"),
+                        locJsonObj.getString("location_name"),
+                        locJsonObj.getDouble("location_lat)"),
+                        locJsonObj.getDouble("location_lon")
+                );
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            transitDirectory.getStationList().add(newStation);
+        }
     }
 
     private void initializeSettings (int APIID, int routeID) {
