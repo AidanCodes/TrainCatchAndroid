@@ -1,5 +1,6 @@
 package com.aidanssite.traincatch;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -31,7 +32,11 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
     private String baseURL, routeString, APIKey = "";
     private TransitDirectory transitDirectory = null;
 
-    public APIManager (int APIID, int routeID, String[][] queryParams, String[][] routeParams) {
+    private Context callActivity;
+
+    public APIManager (int APIID, int routeID, String[][] queryParams, String[][] routeParams, Context callActivity) {
+        this.callActivity = callActivity;
+
         this.queryParams = queryParams;
         this.routeParams = routeParams;
 
@@ -45,12 +50,14 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
 
     @Override
     protected JSONArray doInBackground (Void...voids) {
-        Log.d("APIManager", "Began execution");
+        Log.d("APIManager", "Began execution: " + routeString);
 
         String rJsonString = "";
         JSONArray rJson = null;
 
         String queryStr = formatQueryParams(queryParams, APIKey);
+
+        Log.d("APIManager", "Converted Parameters: " + queryStr);
 
         try {
             URL url = new URL(baseURL + routeString + queryStr);
@@ -83,26 +90,35 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
                 switch (routeID) {
                     case DISTANCE_MATRIX: {
                         Log.d("APIManager Result", "Google Maps Distance Matrix: " + result);
+                        break;
                     }
                 }
+
+                break;
             }
 
             case SEPTA: {
                 switch (routeID) {
                     case SYSTEM_LOCATIONS: {
+                        Log.d("APIManager Result", "SEPTA Location: " + result);
                         parseSeptaLocations(result);
+                        ((LocationActivity) callActivity).updateMapPointers();
+                        break;
                     }
 
                     case RAIL_AD: {
                         Log.d("APIManager Result", "SEPTA Rail A/D: " + result);
+                        break;
                     }
                 }
+
+                break;
             }
         }
     }
 
     private String formatQueryParams (String[][] queryParams, String APIKey) {
-        if (queryParams.length != 0 && APIKey.length() != 0) {
+        if (queryParams.length != 0 || APIKey.length() != 0) {
             String queryStr = "?";
 
             for (int i = 0; i < queryParams.length; i++) {
@@ -155,7 +171,7 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
                         locJsonObj.getString("location_type"),
                         locJsonObj.getString("location_id"),
                         locJsonObj.getString("location_name"),
-                        locJsonObj.getDouble("location_lat)"),
+                        locJsonObj.getDouble("location_lat"),
                         locJsonObj.getDouble("location_lon")
                 );
             } catch (JSONException e) {
@@ -163,6 +179,8 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
             }
 
             transitDirectory.getStationList().add(newStation);
+
+            transitDirectory.debug();
         }
     }
 
@@ -178,8 +196,11 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
                 switch (routeID) {
                     case DISTANCE_MATRIX: {
                         routeString = "distancematrix/json";
+                        break;
                     }
                 }
+
+                break;
             }
 
             case SEPTA: {
@@ -188,12 +209,16 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
                 switch (routeID) {
                     case SYSTEM_LOCATIONS: {
                         routeString = "locations/get_locations.php";
+                        break;
                     }
 
                     case RAIL_AD: {
                         routeString = "Arrivals/";
+                        break;
                     }
                 }
+
+                break;
             }
         }
     }

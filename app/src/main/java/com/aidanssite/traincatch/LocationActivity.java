@@ -3,6 +3,9 @@ package com.aidanssite.traincatch;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,7 +19,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class LocationActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -25,7 +31,8 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
     private LocationManager mLocationManager;
     private final int LOCATION_REFRESH_TIME = 60 * 1000;
     private final int LOCATION_REFRESH_DISTANCE = 0;
-    Location userLoc = null;
+    private TransitDirectory transitDir;
+    private Location userLoc = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +52,14 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
             Log.e("Exception", "Location error:" + e);
         }
 
+        transitDir = ((TrainCatch) this.getApplication()).setTransitDirectory(new TransitDirectory());
+
         userLoc = getUserLoc();
         Log.d("Location Info", "Result: " + userLoc);
 
         if (userLoc != null) {
             String[][] latLonParam = {{"lat", Double.toString(userLoc.getLatitude())}, {"lon", Double.toString(userLoc.getLongitude())}, {"radius", "100"}, {"type", "rail_stations"}};
-            APIManager septaLocAPI = new APIManager(APIManager.SEPTA, APIManager.SYSTEM_LOCATIONS, latLonParam, new String[0][0]);
+            APIManager septaLocAPI = new APIManager(APIManager.SEPTA, APIManager.SYSTEM_LOCATIONS, latLonParam, new String[0][0], getApplicationContext());
             septaLocAPI.execute();
         }
     }
@@ -73,9 +82,6 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
             mMap.addMarker(new MarkerOptions().position(userLatLng).title("You are here"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15.0f));
         }
-        /*LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
     }
 
     private Location getUserLoc() {
@@ -103,7 +109,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
                 } else {
                     Toast.makeText(LocationActivity.this, "Permission denied to utilize your fine location. Location services may be inaccurate .", Toast.LENGTH_SHORT).show();
                 }
-                return;
+                break;
             }
         }
     }
@@ -129,4 +135,22 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
         }
     };
+
+    public void updateMapPointers () {
+        userLoc = getUserLoc();
+        mMap.clear();
+        if (userLoc != null) {
+            LatLng userLatLng = new LatLng(userLoc.getLatitude(), userLoc.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(userLatLng).title("You are here"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15.0f));
+        }
+
+        for (TransitStation station : transitDir.getStationList()) {
+            Bitmap bitIcon = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.septa_logo);
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitIcon, 20, 20, false));
+
+            Marker mStation = mMap.addMarker(new MarkerOptions().position(new LatLng(station.getLatitude(), station.getLongitude())).title(station.getLocationName()).icon(icon));
+            mStation.setTag(station);
+        }
+    }
 }

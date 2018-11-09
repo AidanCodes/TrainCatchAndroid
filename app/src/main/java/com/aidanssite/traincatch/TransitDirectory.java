@@ -1,5 +1,7 @@
 package com.aidanssite.traincatch;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 public class TransitDirectory {
@@ -22,5 +24,15 @@ public class TransitDirectory {
 
     public ArrayList<TransitStation> getStationList () {
         return stationList;
+    }
+
+    public void debug() {
+        for (TransitRoute route : routeList) {
+            Log.d("Directory Debug", "Route: " + route);
+        }
+
+        for (TransitStation station : stationList) {
+            Log.d("Directory Debug", "Station: " + station);
+        }
     }
 }
