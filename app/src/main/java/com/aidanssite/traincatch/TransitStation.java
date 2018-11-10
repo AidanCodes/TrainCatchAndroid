@@ -40,11 +40,11 @@ public class TransitStation {
     }
 
     public String getLocationName () {
-        return locationID;
+        return locationName;
     }
 
     public String getLocationID () {
-        return locationName;
+        return locationID;
     }
 
     public void addRoute (String routeName, ArrayList<TransitRoute> routeList) {

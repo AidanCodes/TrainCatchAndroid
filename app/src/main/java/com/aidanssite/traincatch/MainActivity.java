@@ -20,8 +20,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private TransitDirectory transitDir; // TODO: Make this global
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        transitDir = ((TrainCatch) this.getApplication()).setTransitDirectory(new TransitDirectory());
+        ((TrainCatch) this.getApplication()).setTransitDirectory(new TransitDirectory());
     }
 
     public void openStartAct() {

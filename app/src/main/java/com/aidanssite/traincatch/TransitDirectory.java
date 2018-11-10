@@ -13,7 +13,8 @@ public class TransitDirectory {
         stationList = new ArrayList<>();
     }
 
-    public TransitDirectory (ArrayList<TransitRoute> routeList, ArrayList<TransitStation> stationList) {
+    public TransitDirectory (ArrayList<TransitRoute> routeList,
+                             ArrayList<TransitStation> stationList) {
         this.routeList = routeList;
         this.stationList = stationList;
     }

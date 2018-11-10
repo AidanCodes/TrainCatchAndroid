@@ -159,7 +159,6 @@ public class APIManager extends AsyncTask<Void, Void, JSONArray> {
     }
 
     private void parseSeptaLocations (JSONArray locJson) {
-        //  TODO
         for (int i = 0; i < locJson.length(); i ++) {
             TransitStation newStation = null;
             JSONObject locJsonObj = null;

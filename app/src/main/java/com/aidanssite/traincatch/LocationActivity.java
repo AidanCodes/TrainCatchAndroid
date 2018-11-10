@@ -1,6 +1,7 @@
 package com.aidanssite.traincatch;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -59,7 +60,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
         if (userLoc != null) {
             String[][] latLonParam = {{"lat", Double.toString(userLoc.getLatitude())}, {"lon", Double.toString(userLoc.getLongitude())}, {"radius", "100"}, {"type", "rail_stations"}};
-            APIManager septaLocAPI = new APIManager(APIManager.SEPTA, APIManager.SYSTEM_LOCATIONS, latLonParam, new String[0][0], getApplicationContext());
+            APIManager septaLocAPI = new APIManager(APIManager.SEPTA, APIManager.SYSTEM_LOCATIONS, latLonParam, new String[0][0], this);
             septaLocAPI.execute();
         }
     }
@@ -147,7 +148,7 @@ public class LocationActivity extends FragmentActivity implements OnMapReadyCall
 
         for (TransitStation station : transitDir.getStationList()) {
             Bitmap bitIcon = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.septa_logo);
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitIcon, 20, 20, false));
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(Bitmap.createScaledBitmap(bitIcon, 200, 200, false));
 
             Marker mStation = mMap.addMarker(new MarkerOptions().position(new LatLng(station.getLatitude(), station.getLongitude())).title(station.getLocationName()).icon(icon));
             mStation.setTag(station);
